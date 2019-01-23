@@ -11,7 +11,7 @@ namespace SkiInfoSystem.Core
     {
         public int Id { get; }
         public string Name { get; }
-
+        public List<Sensor> ListOfSensor { get; set; }
         public Slope(int id, string name)
         {
         }

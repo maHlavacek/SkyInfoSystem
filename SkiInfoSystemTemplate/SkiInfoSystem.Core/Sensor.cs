@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SkiInfoSystem.Core
 {
-    internal class Sensor
+    public class Sensor
     {
         /// <summary>
         /// Das Ereignis MeasurementOccured wird gefeuert, wenn sich eine Wertänderung ergeben hat.
