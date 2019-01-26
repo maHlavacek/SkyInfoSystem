@@ -10,9 +10,9 @@ namespace SkiInfoSystem.Core
     public class Controller
     {
         #region Fields
-        private List<Slope> _slopes;
-        private List<Sensor> _sensors;
-        private List<Measurement> _measurements;
+        public readonly List<Slope> _slopes;
+        public readonly List<Sensor> _sensors;
+        public readonly List<Measurement> _measurements;
 
         const string FileNameForMeasurements = "measurements.csv";
         const string FileNameForSensors = "sensors.csv";
@@ -99,7 +99,6 @@ namespace SkiInfoSystem.Core
             return File.ReadAllLines(path, Encoding.Default);
         }
         #endregion
-
 
     }
 }

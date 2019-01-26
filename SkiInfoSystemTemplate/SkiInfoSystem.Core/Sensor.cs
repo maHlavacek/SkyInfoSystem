@@ -17,11 +17,19 @@ namespace SkiInfoSystem.Core
         public int Id { get; }
         public int SlopeId { get; }
         public MeasurementType MeasurementType { get; }
-
-        
+    
 
         public Sensor(int id, int slopeId, MeasurementType measurementType)
         {
+            Id = id;
+            SlopeId = slopeId;
+            MeasurementType = measurementType;
         }
+
+        public void OnMeasurementOccured(object sender, double measurement)
+        {
+            MeasurementOccured?.Invoke(this, measurement);
+        }
+
     }
 }
