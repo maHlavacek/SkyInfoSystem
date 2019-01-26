@@ -10,7 +10,10 @@ namespace SkiInfoSystem.Core
     public class Controller
     {
         #region Fields
-        private List<Slope> slopes;
+        private List<Slope> _slopes;
+        private List<Sensor> _sensors;
+        private List<Measurement> _measurements;
+
         const string FileNameForMeasurements = "measurements.csv";
         const string FileNameForSensors = "sensors.csv";
         const string FileNameForSlopes = "slopes.csv";
@@ -18,13 +21,15 @@ namespace SkiInfoSystem.Core
         #endregion
         public Controller()
         {
-
+            _slopes = ReadSlopesFromCSV(FileNameForSlopes);
+            _sensors = ReadSensorsFromCsv(FileNameForSensors);
+            _measurements = ReadMeasurementsFromCsv(FileNameForMeasurements);
         }
 
         #region Methods
-        public List<Measurement> ReadMeasurementsFromCsv()
+        public List<Measurement> ReadMeasurementsFromCsv(string filename)
         {
-            string[] lines = GetAllLines(FileNameForMeasurements);
+            string[] lines = GetAllLines(filename);
             string[] column;
             List<Measurement> measurements = new List<Measurement>();
             string date;
@@ -46,10 +51,10 @@ namespace SkiInfoSystem.Core
             return measurements;
         }
 
-        public List<Sensor> ReadSensorsFromCsv()
+        public List<Sensor> ReadSensorsFromCsv(string filename)
         {
 
-            string[] lines = GetAllLines(FileNameForSensors);
+            string[] lines = GetAllLines(filename);
             string[] columns;
             List<Sensor> sensors = new List<Sensor>();
             int iD;
@@ -66,9 +71,9 @@ namespace SkiInfoSystem.Core
             };
             return sensors;
         }
-        public List<Slope> ReadSlopesFromCSV()
+        public List<Slope> ReadSlopesFromCSV(string filename)
         {
-            string[] lines = GetAllLines(FileNameForSlopes);
+            string[] lines = GetAllLines(filename);
             string[] columns;
             List<Slope> slopes = new List<Slope>();
             int iD;
