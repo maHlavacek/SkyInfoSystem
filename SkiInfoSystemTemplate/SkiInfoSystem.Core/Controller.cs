@@ -45,6 +45,28 @@ namespace SkiInfoSystem.Core
             }
             return measurements;
         }
+
+        public List<Sensor> ReadSensorsFromCsv()
+        {
+
+            string[] lines = GetAllLines(FileNameForSensors);
+            string[] columns;
+            List<Sensor> sensors = new List<Sensor>();
+            int iD;
+            int slopeId;
+            MeasurementType type;
+
+            for (int i = 1; i < lines.Length; i++)
+            {
+                columns = lines[i].Split(';');
+                iD = int.Parse(columns[0]);
+                slopeId = int.Parse(columns[1]);
+                type = (MeasurementType)Enum.Parse(typeof(MeasurementType), columns[2]);
+                sensors.Add(new Sensor(iD, slopeId, type));
+            };
+            return sensors;
+        }
+
         public string[] GetAllLines(string filename)
         {
             string path = MyFile.GetFullNameInApplicationTree(filename);
