@@ -66,6 +66,23 @@ namespace SkiInfoSystem.Core
             };
             return sensors;
         }
+        public List<Slope> ReadSlopesFromCSV()
+        {
+            string[] lines = GetAllLines(FileNameForSlopes);
+            string[] columns;
+            List<Slope> slopes = new List<Slope>();
+            int iD;
+            string name;
+            for (int i = 0; 1 < lines.Length; i++)
+            {
+                columns = lines[i].Split(';');
+                iD = int.Parse(columns[0]);
+                name = columns[1];
+
+                slopes.Add(new Slope(iD, name));
+            }
+            return slopes;
+        }
 
         public string[] GetAllLines(string filename)
         {
