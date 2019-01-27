@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+
 namespace SkiInfoSystem.Core
 {
     /// <summary>
@@ -16,7 +17,15 @@ namespace SkiInfoSystem.Core
         {
             Id = id;
             Name = name;
+            Sensor.MeasurementOccured += OnMeasurementOccured;
+
         }
-        
+
+        private void OnMeasurementOccured(object sender, string massage)
+        {
+
+        }
+
+
     }
 }
