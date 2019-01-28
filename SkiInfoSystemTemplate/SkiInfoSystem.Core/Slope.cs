@@ -12,20 +12,12 @@ namespace SkiInfoSystem.Core
     {
         public int Id { get; }
         public string Name { get; }
-        public List<Sensor> ListOfSensor { get; set; }
+        public List<Sensor> ListOfSensor { get; private set; }
+
+
         public Slope(int id, string name)
-        {
-            Id = id;
-            Name = name;
-            Sensor.MeasurementOccured += OnMeasurementOccured;
-
+        {          
         }
-
-        private void OnMeasurementOccured(object sender, string massage)
-        {
-
-        }
-
 
     }
 }
