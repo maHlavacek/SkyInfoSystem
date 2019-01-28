@@ -18,16 +18,39 @@ namespace SkiInfoSystem.Core
         public int SlopeId { get; }
         public MeasurementType MeasurementType { get; }
 
+        private double _lastValue;
+
         private CsvFileDataProvider _measurements;
         public IEnumerable<Measurement> Measurements { get;private set; }
 
         public Sensor(int id, int slopeId, MeasurementType measurementType)
         {
+
             Id = id;
             SlopeId = slopeId;
             MeasurementType = measurementType;
             _measurements = new CsvFileDataProvider();
             IEnumerable<Measurement> measurements = _measurements.GetMeasurmentsForSensor(id);
+
+            FastClock.Instance.OneMinuteIsOver += Instance_OneMinuteIsOver;
+        }
+
+        private void Instance_OneMinuteIsOver(object sender, DateTime time)
+        {
+
+            Measurements.Where(w => w.Timestamp == time);
+
+            foreach (Measurement measurement in Measurements)
+            {
+                if(measurement.Timestamp == time)
+                {
+                    if(measurement.Value != _lastValue)
+                    {
+                        MeasurementOccured?.Invoke(this, measurement.Value);
+                        _lastValue = measurement.Value;
+                    }
+                }
+            }
         }
     }
 }
