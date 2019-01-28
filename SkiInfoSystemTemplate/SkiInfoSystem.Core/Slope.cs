@@ -12,11 +12,16 @@ namespace SkiInfoSystem.Core
     {
         public int Id { get; }
         public string Name { get; }
-        public List<Sensor> ListOfSensor { get; private set; }
+        public IEnumerable<Sensor> Sensor { get; private set; }
 
+        private CsvFileDataProvider _sensors;
 
         public Slope(int id, string name)
-        {          
+        {
+            Id = id;
+            Name = name;
+            _sensors = new CsvFileDataProvider();
+            Sensor = _sensors.GetSensorsForSlope(id);
         }
 
     }

@@ -14,16 +14,20 @@ namespace SkiInfoSystem.Core
         /// </summary>
         public event EventHandler<double> MeasurementOccured;
 
-        private double _lastMeasurement;
         public int Id { get; }
         public int SlopeId { get; }
         public MeasurementType MeasurementType { get; }
+
+        private CsvFileDataProvider _measurements;
+        public IEnumerable<Measurement> Measurements { get;private set; }
 
         public Sensor(int id, int slopeId, MeasurementType measurementType)
         {
             Id = id;
             SlopeId = slopeId;
             MeasurementType = measurementType;
+            _measurements = new CsvFileDataProvider();
+            IEnumerable<Measurement> measurements = _measurements.GetMeasurmentsForSensor(id);
         }
     }
 }
