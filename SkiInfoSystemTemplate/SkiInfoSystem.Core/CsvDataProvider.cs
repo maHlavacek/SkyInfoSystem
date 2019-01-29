@@ -15,6 +15,11 @@ namespace SkiInfoSystem.Core
         private const string FileNameForSlopes = "Slopes.csv";
         private static CsvDataProvider _instance;
 
+        private IEnumerable<Measurement> _measurements;
+        private IEnumerable<Sensor> _sensors;
+        private IEnumerable<Slope> _slopes;
+
+
         public static CsvDataProvider Instance
         {
             get
@@ -26,12 +31,12 @@ namespace SkiInfoSystem.Core
                 return _instance;
             }
         }
-        public IEnumerable<Measurement> GetMeasurmentsForSensor(int sensorId)
+
+        public List<Measurement> GetMeasurementsFromCsv()
         {
             string[] lines = GetAllLines(FileNameForMeasurements);
             string[] columns;
-            IEnumerable<Measurement> measurements = new List<Measurement>();
-
+            List<Measurement> measurements = new List<Measurement>();
             for (int i = 1; i < lines.Length; i++)
             {
                 columns = lines[i].Split(';');
@@ -39,18 +44,24 @@ namespace SkiInfoSystem.Core
                 int sensId = int.Parse(columns[1]);
                 double value = double.Parse(columns[2]);
 
-                Measurement measurement = new Measurement(dateTime,sensId,value);
-                measurements.Append(measurement).Where(sId => sId.SensorId == sensorId);
+                Measurement measurement = new Measurement(dateTime, sensId, value);
+                measurements.Add(measurement);
             }
             return measurements;
         }
 
-        public IEnumerable<Sensor> GetSensorsForSlope(int slopeId)
+
+        public IEnumerable<Measurement> GetMeasurmentsForSensor(int sensorId)
+        {
+            return _measurements.Where(sId => sId.SensorId == sensorId);
+        }
+
+
+        public List<Sensor> GetSensorsFromCsv()
         {
             string[] lines = GetAllLines(FileNameForSensors);
             string[] columns;
-            IEnumerable<Sensor> sensors = new List<Sensor>();
-
+            List<Sensor> sensors = new List<Sensor>();
             for (int i = 1; i < lines.Length; i++)
             {
                 columns = lines[i].Split(';');
@@ -58,28 +69,38 @@ namespace SkiInfoSystem.Core
                 int slopId = int.Parse(columns[1]);
                 MeasurementType type = (MeasurementType)Enum.Parse(typeof(MeasurementType), columns[2]);
 
-                Sensor sensor = new Sensor(iD,slopId,type);
-                sensors.Append(sensor).Where(slId => slId.SlopeId == slopeId);
+                Sensor sensor = new Sensor(iD, slopId, type);
+                sensors.Add(sensor);
             }
             return sensors;
         }
 
-        public IEnumerable<Slope> GetSlops()
+        public IEnumerable<Sensor> GetSensorsForSlope(int slopeId)
         {
-            string[] lines = GetAllLines(FileNameForSlopes);
-            string[] columns;
-            IEnumerable<Slope> slopes = new List<Slope>();
+            return _sensors.Where(w => w.SlopeId == slopeId);
+        }
 
+
+        public List<Slope> GetSlopsFromCsv()
+        {
+            string[] lines = GetAllLines(FileNameForSensors);
+            string[] columns;
+            List<Slope> slopes = new List<Slope>();
             for (int i = 1; i < lines.Length; i++)
             {
                 columns = lines[i].Split(';');
                 int iD = int.Parse(columns[0]);
                 string name = columns[1];
-                Slope slope = new Slope(iD,name);
+                Slope slope = new Slope(iD, name);
 
-                slopes.Append(slope);
+                slopes.Add(slope);
             }
             return slopes;
+        }
+
+        public IEnumerable<Slope> GetSlops()
+        {
+            return _slopes;
         }
 
         public string[] GetAllLines(string filename)

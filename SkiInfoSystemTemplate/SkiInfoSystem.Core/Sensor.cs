@@ -26,9 +26,9 @@ namespace SkiInfoSystem.Core
             Id = id;
             SlopeId = slopeId;
             MeasurementType = measurementType;
+            Measurements = new List<Measurement>();
             Measurements = CsvDataProvider.Instance.GetMeasurmentsForSensor(id);
             FastClock.Instance.OneMinuteIsOver += Instance_OneMinuteIsOver;
-            
         }
 
         private void Instance_OneMinuteIsOver(object sender, DateTime time)

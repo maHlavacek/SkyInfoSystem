@@ -29,8 +29,6 @@ namespace SkiInfoSystem.Core
         private const int OK_MAX_SOLAR = 245;
         private const int OK_MIN_SOLAR = 190;
 
-
-
         private double _avgTemperatur;
         private double _avgSolarRadiation;
         private double _avgWindIntensity;
