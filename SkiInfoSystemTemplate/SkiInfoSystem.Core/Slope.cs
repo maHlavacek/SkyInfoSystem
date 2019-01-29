@@ -14,6 +14,8 @@ namespace SkiInfoSystem.Core
         public string Name { get; }
         public IEnumerable<Sensor> Sensors { get; private set; }
 
+        public SlopeCondition SlopeCondition { get; private set; }
+
         private double _avgTemperatur;
         private double _avgWindIntensity;
         private double _avgSolarRadiation;
@@ -99,6 +101,8 @@ namespace SkiInfoSystem.Core
 
             int slopeCondition = Math.Min(tempCondition, solarCondition);
             slopeCondition = Math.Min(slopeCondition, windCondition);
+
+            SlopeCondition actualSlopeCondition = (SlopeCondition)Enum.Parse(typeof(SlopeCondition), slopeCondition.ToString());
 
 
             ConditionsUpdated?.Invoke(this, massege);
