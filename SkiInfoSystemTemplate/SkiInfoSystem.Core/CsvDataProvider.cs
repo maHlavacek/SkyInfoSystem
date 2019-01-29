@@ -32,6 +32,13 @@ namespace SkiInfoSystem.Core
             }
         }
 
+        private CsvDataProvider()
+        {
+            _measurements = GetMeasurementsFromCsv();
+            _sensors = GetSensorsFromCsv();
+            _slopes = GetSlopsFromCsv();
+        }
+
         public List<Measurement> GetMeasurementsFromCsv()
         {
             string[] lines = GetAllLines(FileNameForMeasurements);
