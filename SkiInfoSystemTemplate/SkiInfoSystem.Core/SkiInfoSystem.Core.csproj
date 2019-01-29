@@ -41,7 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CsvFileDataProvider.cs" />
+    <Compile Include="CsvDataProvider.cs" />
     <Compile Include="Enumerations.cs" />
     <Compile Include="IDataProvider.cs" />
     <Compile Include="Measurement.cs" />

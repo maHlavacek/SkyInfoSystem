@@ -24,9 +24,6 @@ namespace SkiInfoSystem.Core
 
         public Measurement(DateTime timestamp, int sensorId, double value)
         {
-            Timestamp = timestamp;
-            SensorId = sensorId;
-            Value = value;
         }
 
     }
