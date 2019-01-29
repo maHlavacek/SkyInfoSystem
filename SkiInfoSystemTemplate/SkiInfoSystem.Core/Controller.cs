@@ -12,6 +12,8 @@ namespace SkiInfoSystem.Core
         #region Fields
         public IEnumerable<Slope> Slopes { get;private set; }
 
+        public event EventHandler<string> ActualSlopesConditions;
+
         private CsvFileDataProvider _slopes;
 
         #endregion
@@ -30,9 +32,9 @@ namespace SkiInfoSystem.Core
             }
         }
 
-        private void OnConditionsUpdated(object sender, SlopeCondition conditions)
+        private void OnConditionsUpdated(object sender, string massege)
         {
-
+            
         }
 
         #region Methods

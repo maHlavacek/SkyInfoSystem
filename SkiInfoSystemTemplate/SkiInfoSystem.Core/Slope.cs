@@ -102,10 +102,19 @@ namespace SkiInfoSystem.Core
             int slopeCondition = Math.Min(tempCondition, solarCondition);
             slopeCondition = Math.Min(slopeCondition, windCondition);
 
-            SlopeCondition actualSlopeCondition = (SlopeCondition)Enum.Parse(typeof(SlopeCondition), slopeCondition.ToString());
+            SlopeCondition = (SlopeCondition)Enum.Parse(typeof(SlopeCondition), slopeCondition.ToString());
 
+            OnConditionUpdated(SlopeCondition.ToString());
+        //    ConditionsUpdated?.Invoke(this, massege);
+        }
 
+        public void OnConditionUpdated(string massege)
+        {
             ConditionsUpdated?.Invoke(this, massege);
+        }
+        public override string ToString()
+        {
+            return $"Slope {this.Name} SlopeCondition: {SlopeCondition}";
         }
     }
 }
