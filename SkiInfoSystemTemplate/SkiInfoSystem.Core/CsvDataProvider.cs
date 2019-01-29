@@ -13,8 +13,19 @@ namespace SkiInfoSystem.Core
         private const string FileNameForMeasurements = "Measurements.csv";
         private const string FileNameForSensors = "Sensors.csv";
         private const string FileNameForSlopes = "Slopes.csv";
+        private static CsvDataProvider _instance;
 
-
+        public static CsvDataProvider Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new CsvDataProvider();
+                }
+                return _instance;
+            }
+        }
         public IEnumerable<Measurement> GetMeasurmentsForSensor(int sensorId)
         {
             string[] lines = GetAllLines(FileNameForMeasurements);

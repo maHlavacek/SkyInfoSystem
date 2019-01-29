@@ -26,21 +26,16 @@ namespace SkiInfoSystem.Core
             Id = id;
             SlopeId = slopeId;
             MeasurementType = measurementType;
-            CsvDataProvider measurements = new CsvDataProvider();
-            Measurements = measurements.GetMeasurmentsForSensor(id);
+            Measurements = CsvDataProvider.Instance.GetMeasurmentsForSensor(id);
             FastClock.Instance.OneMinuteIsOver += Instance_OneMinuteIsOver;
+            
         }
 
         private void Instance_OneMinuteIsOver(object sender, DateTime time)
         {
-            foreach (Measurement measurement in Measurements)
-            {
-                if(measurement.Timestamp == time && _lastValeu != measurement.Value)
-                {
-                    _lastValeu = measurement.Value;
-                    OnMeasurementOccured(measurement.Value);                   
-                }
-            }
+            double avg;                
+            avg = Measurements.Where(w => w.Timestamp == time && _lastValeu != w.Value).Average(a => a.Value);
+            OnMeasurementOccured(avg);                             
         }
 
         public void OnMeasurementOccured(double value)
