@@ -19,6 +19,20 @@ namespace SkiInfoSystem.Core
         {
             _slopes = new CsvFileDataProvider();
             Slopes = _slopes.GetSlops();
+            RegistrationForConditionsUpdated();
+        }
+
+        public void RegistrationForConditionsUpdated()
+        {
+            foreach (Slope slopes in Slopes)
+            {
+                slopes.ConditionsUpdated += OnConditionsUpdated;
+            }
+        }
+
+        private void OnConditionsUpdated(object sender, SlopeCondition conditions)
+        {
+
         }
 
         #region Methods
