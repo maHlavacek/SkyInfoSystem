@@ -11,8 +11,9 @@ namespace SkiInfoSystem.Core
     {
         public int Id { get; }
         public string Name { get; }
+      
 
-        private IEnumerable<Sensor> _sensors;
+        public List<Sensor> Sensors { get; set; }
 
         private const int PERFECT_MAX_TEMP = 8;
         private const int PERFECT_MIN_TEMP = -8;
@@ -37,20 +38,12 @@ namespace SkiInfoSystem.Core
         { 
             Id = id;
             Name = name;
-            CsvDataProvider sensors = new CsvDataProvider();
-            _sensors = sensors.GetSensorsForSlope(id);
-
-            foreach (Sensor sensor in _sensors)
-            {
-                sensor.MeasurementOccured += Sensor_MeasurementOccured;
-            }
-
         }
 
         private void Sensor_MeasurementOccured(object sender, double value)
         {
             Sensor currentSensor = sender as Sensor;
-            foreach (Sensor sensor in _sensors)
+            foreach (Sensor sensor in Sensors)
             {
                 if(sensor.MeasurementType == MeasurementType.SolarRadiation)
                 {

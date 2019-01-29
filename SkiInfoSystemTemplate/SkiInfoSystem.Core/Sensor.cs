@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SkiInfoSystem.Core
 {
-    internal class Sensor
+    public class Sensor
     {
         /// <summary>
         /// Das Ereignis MeasurementOccured wird gefeuert, wenn sich eine Wertänderung ergeben hat.
@@ -17,7 +17,7 @@ namespace SkiInfoSystem.Core
         public int Id { get; }
         public int SlopeId { get; }
         public MeasurementType MeasurementType { get; }
-        public IEnumerable<Measurement> Measurements { get;private set; }
+        public List<Measurement> Measurements { get;private set; }
 
         private double _lastValeu;
 
@@ -26,8 +26,6 @@ namespace SkiInfoSystem.Core
             Id = id;
             SlopeId = slopeId;
             MeasurementType = measurementType;
-            Measurements = new List<Measurement>();
-            Measurements = CsvDataProvider.Instance.GetMeasurmentsForSensor(id);
             FastClock.Instance.OneMinuteIsOver += Instance_OneMinuteIsOver;
         }
 
