@@ -1,23 +1,24 @@
-﻿using SkiInfoSystem.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SkiInfoSystem.Utils;
 
 namespace SkiInfoSystem.Core
 {
-    class CsvDataProvider : IDataProvider
+    public class CsvDataProvider : IDataProvider
     {
-        private const string FileNameForMeasurements = "Measurements.csv";
-        private const string FileNameForSensors = "Sensors.csv";
-        private const string FileNameForSlopes = "Slopes.csv";
-        private static CsvDataProvider _instance;
 
-        private IEnumerable<Measurement> _measurements;
-        private IEnumerable<Sensor> _sensors;
-        private IEnumerable<Slope> _slopes;
+        private IEnumerable<Slope> _slopesStore;
+        private IEnumerable<Measurement> _measurementsStore;
+        private IEnumerable<Sensor> _sensorsStore;
+        private const string FileNameForSlopes = "slopes.csv";
+        private const string FileNameForMEasurements = "measurements.csv";
+        private const string FileNameForSensors = "sensors.csv";
+        private static CsvDataProvider _instance;
 
 
         public static CsvDataProvider Instance
@@ -31,94 +32,108 @@ namespace SkiInfoSystem.Core
                 return _instance;
             }
         }
-
         private CsvDataProvider()
         {
-            _measurements = GetMeasurementsFromCsv();
-            _sensors = GetSensorsFromCsv();
-            _slopes = GetSlopsFromCsv();
+            _slopesStore = CreateSlopesList();
+            _sensorsStore = CreateSensorList();
+            _measurementsStore = CreateMeasurementsList();
+
         }
 
-        public List<Measurement> GetMeasurementsFromCsv()
+        private List<Sensor> CreateSensorList()
         {
-            string[] lines = GetAllLines(FileNameForMeasurements);
-            string[] columns;
-            List<Measurement> measurements = new List<Measurement>();
+            List<Sensor> sensors = new List<Sensor>();
+            string fullPath = MyFile.GetFullNameInApplicationTree(FileNameForSensors);
+            if (!File.Exists(fullPath)) throw new ArgumentNullException("Datei nicht vorhanden");
+            string[] lines = File.ReadAllLines(fullPath);
             for (int i = 1; i < lines.Length; i++)
             {
-                columns = lines[i].Split(';');
-                DateTime dateTime = DateTime.Parse(columns[0] + " " + columns[1]);
-                int sensId = int.Parse(columns[1]);
-                double value = double.Parse(columns[2]);
+                string[] colums = lines[i].Split(';');
+                int id = Convert.ToInt32(colums[0]);
+                int slopid = Convert.ToInt32(colums[1]);
+                string temp = colums[2];
+                MeasurementType measurementtype = (MeasurementType)Enum.Parse(typeof(MeasurementType), colums[2]);
+                sensors.Add(new Sensor(id, slopid, measurementtype));
+            }
+            return sensors;
+        }
 
-                Measurement measurement = new Measurement(dateTime, sensId, value);
-                measurements.Add(measurement);
+        private List<Measurement> CreateMeasurementsList()
+        {
+            List<Measurement> measurements = new List<Measurement>();
+            string fullPath = MyFile.GetFullNameInApplicationTree(FileNameForMEasurements);
+            if (!File.Exists(fullPath)) throw new ArgumentNullException("Datei nicht vorhanden");
+            string[] lines = File.ReadAllLines(fullPath);
+            for (int i = 1; i < lines.Length; i++)
+            {
+                string[] colums = lines[i].Split(';');
+                DateTime timestamp = Convert.ToDateTime(colums[0] + " " + colums[1]);
+                int sensorid = Convert.ToInt32(colums[2]);
+                double value = Convert.ToDouble(colums[3]);
+                measurements.Add(new Measurement(timestamp, sensorid, value));
             }
             return measurements;
+        }
+        private List<Slope> CreateSlopesList()
+        {
+            List<Slope> slopes = new List<Slope>();
+            string fullPath = MyFile.GetFullNameInApplicationTree(FileNameForSlopes);
+            if (!File.Exists(fullPath)) throw new ArgumentNullException("Datei nicht vorhanden");
+            string[] lines = File.ReadAllLines(fullPath);
+            for (int i = 1; i < lines.Length; i++)
+            {
+                string[] colums = lines[i].Split(';');
+                Int32 id = Convert.ToInt32(colums[0]);
+                slopes.Add(new Slope(id, colums[1]));
+            }
+            return slopes;
         }
 
 
         public IEnumerable<Measurement> GetMeasurmentsForSensor(int sensorId)
         {
-            return _measurements.Where(sId => sId.SensorId == sensorId);
-        }
-
-
-        public List<Sensor> GetSensorsFromCsv()
-        {
-            string[] lines = GetAllLines(FileNameForSensors);
-            string[] columns;
-            List<Sensor> sensors = new List<Sensor>();
-            for (int i = 1; i < lines.Length; i++)
+            if (_measurementsStore == null)
             {
-                columns = lines[i].Split(';');
-                int iD = int.Parse(columns[0]);
-                int slopId = int.Parse(columns[1]);
-                MeasurementType type = (MeasurementType)Enum.Parse(typeof(MeasurementType), columns[2]);
-
-                Sensor sensor = new Sensor(iD, slopId, type);
-                sensors.Add(sensor);
+                _measurementsStore = CreateMeasurementsList();
             }
-            return sensors;
-        }
-
-        public IEnumerable<Sensor> GetSensorsForSlope(int slopeId)
-        {
-            return _sensors.Where(w => w.SlopeId == slopeId);
-        }
-
-
-        public List<Slope> GetSlopsFromCsv()
-        {
-            string[] lines = GetAllLines(FileNameForSensors);
-            string[] columns;
-            List<Slope> slopes = new List<Slope>();
-            for (int i = 1; i < lines.Length; i++)
+            List<Measurement> measurments = new List<Measurement>();
+            foreach (Measurement measurment in _measurementsStore)
             {
-                columns = lines[i].Split(';');
-                int iD = int.Parse(columns[0]);
-                string name = columns[1];
-                Slope slope = new Slope(iD, name);
-
-                slopes.Add(slope);
+                if (measurment.SensorId == sensorId)
+                {
+                    measurments.Add(measurment);
+                }
             }
-            return slopes;
+            return measurments;
         }
 
         public IEnumerable<Slope> GetSlops()
         {
-            return _slopes;
+            if (_slopesStore == null)
+            {
+                _sensorsStore = CreateSensorList();
+            }
+            return _slopesStore;
         }
 
-        public string[] GetAllLines(string filename)
+        public IEnumerable<Sensor> GetSensorsForSlope(int slopeId)
         {
-            string path;
-            path = MyFile.GetFullNameInApplicationTree(filename);
-            if (File.Exists(path))
+            if (_sensorsStore == null)
             {
-                return File.ReadAllLines(path, Encoding.Default);
+                _slopesStore = CreateSlopesList();
             }
-            else return null;
+            List<Sensor> sensors = new List<Sensor>();
+            foreach (Sensor sensor in _sensorsStore)
+            {
+                if (sensor.SlopeId == slopeId)
+                {
+                    sensors.Add(sensor);
+                }
+            }
+            if (sensors == null) throw new ArgumentNullException("Keine Sensoren in der Liste");
+            return sensors;
         }
+
+
     }
 }

@@ -5,10 +5,6 @@ namespace SkiInfoSystem.Core
 {
     public class Controller
     {
-
-
-        public List<Slope> Slopes { get; private set; }
-
         private static Controller _instance;
 
 
@@ -26,23 +22,33 @@ namespace SkiInfoSystem.Core
 
         private Controller()
         {
+            CsvDataProvider.Instance.GetSlops();
         }
 
-        public void GetSlopes()
+        public void CreateSlops(EventHandler<string> ConditionChanged)
         {
-            Slopes = CsvDataProvider.Instance.GetSlops() as List<Slope>;
-        }
-
-        public void GetSensorsForSlope()
-        {
-            foreach (Slope slope in Slopes)
+            List<Slope> slops = CsvDataProvider.Instance.GetSlops() as List<Slope>;
+            foreach (Slope slope in slops)
             {
-                slope.Sensors = CsvDataProvider.Instance.GetSensorsForSlope(slope.Id) as List<Sensor>;
+                slope.ActualConditionChanged += ConditionChanged;
+                slope.InitializeSensors();
             }
         }
-    
+
+        public IEnumerable<Measurement> GetMeasurementsForSensor(int sensorId)
+        {
+            return CsvDataProvider.Instance.GetMeasurmentsForSensor(sensorId);
+        }
+
+        public IEnumerable<Sensor> GetSensorsForSlope(int slopeId)
+        {
+            return CsvDataProvider.Instance.GetSensorsForSlope(slopeId);
+        }
+
+        public IEnumerable<Slope> GetSlopes()
+        {
+            return CsvDataProvider.Instance.GetSlops();
+        }
         
-
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkiInfoSystem.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,9 +31,16 @@ namespace SkiInfoSystem.Core
         private const int OK_MAX_SOLAR = 245;
         private const int OK_MIN_SOLAR = 190;
 
-        private double _avgTemperatur;
-        private double _avgSolarRadiation;
-        private double _avgWindIntensity;
+        private int _avgTemperatur;
+        private int _oldAvgTemperatur;
+
+        private int _avgSolarRadiation;
+        private int _oldAvgSolarRadiation;
+
+        private int _avgWindIntensity;
+        private int _oldAvgWindIntensity;
+
+        public event EventHandler<string> ActualConditionChanged;
 
         public Slope(int id, string name)
         { 
@@ -40,27 +48,38 @@ namespace SkiInfoSystem.Core
             Name = name;
         }
 
-        private void Sensor_MeasurementOccured(object sender, double value)
+        public void InitializeSensors()
         {
-            Sensor currentSensor = sender as Sensor;
+            Sensors = Controller.Instance.GetSensorsForSlope(Id) as List<Sensor>;
             foreach (Sensor sensor in Sensors)
             {
-                if(sensor.MeasurementType == MeasurementType.SolarRadiation)
-                {
-                    _avgSolarRadiation = GetSlopeCondition(value, PERFECT_MIN_SOLAR, PERFECT_MAX_SOLAR, OK_MIN_SOLAR, OK_MAX_SOLAR);
-                }
-
-                if (sensor.MeasurementType == MeasurementType.Temperature)
-                {
-                    _avgTemperatur = GetSlopeCondition(value, PERFECT_MIN_TEMP, PERFECT_MAX_TEMP, OK_MIN_TEMP, OK_MAX_TEMP);
-                }
-                if (sensor.MeasurementType == MeasurementType.WindIntensity)
-                {
-                    _avgSolarRadiation = GetSlopeCondition(value, PERFECT_MIN_WIND, PERFECT_MAX_WIND, OK_MIN_WIND, OK_MAX_WIND);
-                }
+                sensor.MeasurementOccured += Sensor_MeasurementOccured;
+                sensor.Start();
             }
         }
 
+        private void Sensor_MeasurementOccured(object sender, double value)
+        {
+            Sensor sensor = sender as Sensor;
+            _oldAvgSolarRadiation = _avgSolarRadiation;
+            _oldAvgTemperatur = _avgTemperatur;
+            _oldAvgWindIntensity = _avgWindIntensity;
+      
+            if(sensor.MeasurementType == MeasurementType.SolarRadiation)
+            {
+                _avgSolarRadiation = GetSlopeCondition(value, PERFECT_MIN_SOLAR, PERFECT_MAX_SOLAR, OK_MIN_SOLAR, OK_MAX_SOLAR);
+            }
+            if (sensor.MeasurementType == MeasurementType.Temperature)
+            {
+                _avgTemperatur = GetSlopeCondition(value, PERFECT_MIN_TEMP, PERFECT_MAX_TEMP, OK_MIN_TEMP, OK_MAX_TEMP);
+            }
+            if (sensor.MeasurementType == MeasurementType.WindIntensity)
+            {
+                _avgSolarRadiation = GetSlopeCondition(value, PERFECT_MIN_WIND, PERFECT_MAX_WIND, OK_MIN_WIND, OK_MAX_WIND);
+            }
+            
+            CheckIfConditionHasChanged(_oldAvgSolarRadiation, _avgSolarRadiation);
+        }
 
         private int GetSlopeCondition(double avg, int perfectMin,int perfectMax,int okMin,int okMax)
         {
@@ -80,7 +99,26 @@ namespace SkiInfoSystem.Core
             {
                 return (int)SlopeCondition.Bad;
             }
-
         }
+
+        private void CheckIfConditionHasChanged(int oldCondition, int newCondition)
+        {
+            if(oldCondition != newCondition)
+            {
+                OnActualConditionChanged(oldCondition , newCondition);
+            }
+        }
+
+        public void OnActualConditionChanged(int oldCondition, int newCondition)
+        {
+            DateTime dateTime = FastClock.Instance.Time;
+            SlopeCondition oldCon = (SlopeCondition)Enum.Parse(typeof(SlopeCondition), Convert.ToString(oldCondition));
+            SlopeCondition newCon = (SlopeCondition)Enum.Parse(typeof(SlopeCondition), Convert.ToString(newCondition));
+            string massege = String.Format($"{ dateTime,10} - { Name,10} { oldCon,80} => { newCon,5}");
+
+            ActualConditionChanged?.Invoke(this, massege);
+        }
+
+
     }
 }
